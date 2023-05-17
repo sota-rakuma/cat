@@ -7,7 +7,6 @@ import (
 	"github.com/sota-rakuma/cat/myfile"
 	"os"
 	"runtime/trace"
-	"strconv"
 	"sync"
 )
 
@@ -45,14 +44,14 @@ func _main() {
 	setContext(&ctx, "")
 
 	var wg sync.WaitGroup
-	for i := 0; i < len(os.Args); i++ {
+	for i := 1; i < len(os.Args); i++ {
 		wg.Add(1)
 		num := i
 		go func() {
-			defer trace.StartRegion(ctx, "No." +  strconv.Itoa(num) + "goroutine").End()
+			defer trace.StartRegion(ctx, "Read: " + os.Args[num]).End()
 			select {
 			case <-ctx.Done():
-				trace.Log(ctx, "No." +  strconv.Itoa(num) + "goroutine", "read canceled")
+				trace.Log(ctx, "Read: " + os.Args[num], "read canceled")
 			default:
 			}
 			mf := myfile.NewFile(os.Args[num])
@@ -69,6 +68,6 @@ func outputFile(ctx *context.Context, mf *myfile.MyFile) {
 	f := (*ctx).Value(file_key{}).(*os.File)
 	mu.Lock()
 	defer mu.Unlock()
-	f.Write([]byte(mf.Name() + "\n"))
+	f.Write([]byte("\n" + mf.Name() + "\n"))
 	f.Write(mf.Buff())
 }
