@@ -1,4 +1,4 @@
-package filemanipulate
+package myfile
 
 import "os"
 
