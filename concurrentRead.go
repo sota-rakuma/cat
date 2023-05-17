@@ -23,11 +23,8 @@ func setContext(ctx *context.Context, name string) {
 	var mu sync.Mutex
 	*ctx = context.WithValue(*ctx, file_key{}, f)
 	*ctx = context.WithValue(*ctx, mu_key{}, &mu)
-	ctx = catchSignal(ctx)
-}
-
-func catchSignal(ctx *context.Context) *context.Context {
-	*ctx, cancel := context.WithCancel(*ctx)
+	ctx_cp, cancel := context.WithCancel(*ctx)
+	*ctx = ctx_cp
 	go func() {
 		sig := make(chan os.Signal, 1)
 		signal.Notify(sig, syscall.SIGINT)
@@ -37,9 +34,7 @@ func catchSignal(ctx *context.Context) *context.Context {
 		default:
 		}
 	}()
-	return ctx
 }
-
 
 func getFile(file string) (*os.File, error) {
 	if file == "" {
