@@ -65,9 +65,10 @@ func _main() {
 }
 
 func outputFile(ctx *context.Context, mf *myfile.MyFile) {
-	mu := (*ctx).Value(mu_key{}).(sync.Mutex)
+	mu := (*ctx).Value(mu_key{}).(*sync.Mutex)
 	f := (*ctx).Value(file_key{}).(*os.File)
 	mu.Lock()
 	defer mu.Unlock()
-	f.Write(mf.Buff)
+	f.Write([]byte(mf.Name() + "\n"))
+	f.Write(mf.Buff())
 }
